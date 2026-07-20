@@ -1,0 +1,367 @@
+:root {
+  --matcha: #8BA872;
+  --matcha-dark: #6C8754;
+  --matcha-darker: #56693F;
+  --matcha-light: #E9F0E1;
+  --matcha-light-2: #F4F8EF;
+  --white: #FFFFFF;
+  --cream: #FBFAF6;
+  --grey-900: #3A3A38;
+  --grey-600: #82817B;
+  --grey-400: #B4B2AB;
+  --grey-300: #E3E1D9;
+  --grey-100: #F2F1EC;
+
+  --radius-lg: 26px;
+  --radius-md: 16px;
+  --radius-sm: 10px;
+  --shadow-card: 0 20px 45px -20px rgba(58, 58, 56, 0.28);
+  --shadow-soft: 0 6px 16px -8px rgba(58, 58, 56, 0.18);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: ui-rounded, -apple-system, BlinkMacSystemFont, "SF Pro Rounded",
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--grey-900);
+  background: linear-gradient(180deg, var(--matcha-light) 0%, var(--matcha-light-2) 45%, var(--grey-100) 100%);
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: max(28px, env(safe-area-inset-top)) 16px max(28px, env(safe-area-inset-bottom));
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* On wider / desktop viewports (MacBook), lift the card down a touch and give it more breathing room */
+@media (min-width: 640px) {
+  body {
+    align-items: center;
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+}
+
+.app {
+  width: 100%;
+  max-width: 440px;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 28px 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* ---------- Header ---------- */
+
+.app__header { }
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand__badge {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  background: var(--matcha);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-soft);
+}
+
+.brand__text h1 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--grey-900);
+  letter-spacing: -0.01em;
+}
+
+.brand__subtitle {
+  margin: 2px 0 0;
+  font-size: 0.8rem;
+  color: var(--grey-600);
+}
+
+/* ---------- Add form ---------- */
+
+.add-form {
+  display: flex;
+  gap: 8px;
+}
+
+.add-form__input {
+  flex: 1;
+  min-width: 0;
+  border: 1.5px solid var(--grey-300);
+  background: var(--grey-100);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: var(--grey-900);
+  outline: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.add-form__input::placeholder {
+  color: var(--grey-400);
+}
+
+.add-form__input:focus {
+  border-color: var(--matcha);
+  background: var(--white);
+}
+
+.add-form__button {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--matcha);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.add-form__button:hover { background: var(--matcha-dark); }
+.add-form__button:active { transform: scale(0.92); }
+
+/* ---------- Filters ---------- */
+
+.filters {
+  display: flex;
+  gap: 6px;
+  background: var(--grey-100);
+  padding: 4px;
+  border-radius: var(--radius-md);
+}
+
+.filters__btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--grey-600);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 8px 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.filters__btn:hover {
+  color: var(--grey-900);
+}
+
+.filters__btn.is-active {
+  background: var(--white);
+  color: var(--matcha-darker);
+  box-shadow: var(--shadow-soft);
+}
+
+/* ---------- List ---------- */
+
+.list-wrap {
+  min-height: 120px;
+}
+
+.task-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.task {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 8px 10px 6px;
+  border-radius: var(--radius-md);
+  animation: task-in 0.2s ease;
+  transition: background 0.15s ease;
+}
+
+.task:hover {
+  background: var(--grey-100);
+}
+
+@keyframes task-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.task__check {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid var(--grey-300);
+  background: var(--white);
+  color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+}
+
+.task__check:hover {
+  border-color: var(--matcha);
+}
+
+.task__check:active {
+  transform: scale(0.88);
+}
+
+.task.is-done .task__check {
+  background: var(--matcha);
+  border-color: var(--matcha);
+  color: var(--white);
+}
+
+.task__text {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.95rem;
+  color: var(--grey-900);
+  word-break: break-word;
+  outline: none;
+  padding: 2px 0;
+  transition: color 0.15s ease;
+}
+
+.task.is-done .task__text {
+  color: var(--grey-400);
+  text-decoration: line-through;
+  text-decoration-color: var(--grey-300);
+}
+
+.task__delete {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--grey-400);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 0.12s ease, transform 0.12s ease, background 0.12s ease, color 0.12s ease;
+}
+
+.task:hover .task__delete,
+.task:focus-within .task__delete {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.task__delete:hover {
+  background: var(--grey-100);
+  color: #C0685C;
+}
+
+/* Always show delete affordance on touch devices (no hover) */
+@media (hover: none) {
+  .task__delete {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+}
+
+/* ---------- Empty state ---------- */
+
+.empty-state[hidden] {
+  display: none;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px 12px;
+  color: var(--grey-600);
+  text-align: center;
+}
+
+.empty-state__leaf {
+  font-size: 2rem;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* ---------- Footer ---------- */
+
+.app__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 10px;
+  border-top: 1px solid var(--grey-100);
+  font-size: 0.8rem;
+  color: var(--grey-600);
+}
+
+.app__clear {
+  border: none;
+  background: transparent;
+  color: var(--grey-600);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: var(--radius-sm);
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.app__clear:hover {
+  color: var(--matcha-darker);
+  background: var(--matcha-light);
+}
+
+.app__clear:disabled {
+  opacity: 0.4;
+  cursor: default;
+  background: transparent;
+  color: var(--grey-600);
+}
+
+/* ---------- Small screens polish ---------- */
+
+@media (max-width: 380px) {
+  .app { padding: 22px 16px 16px; }
+  .brand__text h1 { font-size: 1.15rem; }
+}

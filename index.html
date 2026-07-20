@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Matcha List</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="A cute, calm matcha-themed to-do list.">
+
+<!-- PWA / theming -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#8BA872">
+<meta name="color-scheme" content="light">
+
+<!-- iOS home screen support -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Matcha List">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
+<!-- favicons -->
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+  <header class="app__header">
+    <div class="brand">
+      <span class="brand__badge" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="4 12.5 9 17.5 20 6"></polyline>
+        </svg>
+      </span>
+      <div class="brand__text">
+        <h1>Matcha List</h1>
+        <p class="brand__subtitle">little tasks, calm mind</p>
+      </div>
+    </div>
+  </header>
+
+  <form class="add-form" id="add-form" autocomplete="off">
+    <input
+      type="text"
+      id="new-task-input"
+      class="add-form__input"
+      placeholder="Add a little task…"
+      maxlength="200"
+      aria-label="New task"
+    >
+    <button type="submit" class="add-form__button" aria-label="Add task">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+    </button>
+  </form>
+
+  <nav class="filters" id="filters" aria-label="Filter tasks">
+    <button class="filters__btn is-active" data-filter="all" type="button">All</button>
+    <button class="filters__btn" data-filter="active" type="button">Active</button>
+    <button class="filters__btn" data-filter="done" type="button">Done</button>
+  </nav>
+
+  <main class="list-wrap">
+    <ul class="task-list" id="task-list"></ul>
+
+    <div class="empty-state" id="empty-state" hidden>
+      <span class="empty-state__leaf" aria-hidden="true">🍵</span>
+      <p id="empty-state-text">All clear. Time for a sip.</p>
+    </div>
+  </main>
+
+  <footer class="app__footer">
+    <span class="app__count" id="task-count">0 items left</span>
+    <button class="app__clear" id="clear-completed" type="button">Clear completed</button>
+  </footer>
+</div>
+
+<template id="task-item-template">
+  <li class="task" data-id="">
+    <button class="task__check" type="button" aria-pressed="false" aria-label="Mark complete">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="4 12.5 9 17.5 20 6"></polyline>
+      </svg>
+    </button>
+    <span class="task__text" tabindex="0" role="textbox" aria-label="Task text"></span>
+    <button class="task__delete" type="button" aria-label="Delete task">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+      </svg>
+    </button>
+  </li>
+</template>
+
+<script src="app.js"></script>
+</body>
+</html>
