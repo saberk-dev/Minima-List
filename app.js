@@ -189,6 +189,18 @@
     if (signedIn) syncStatusEl.textContent = `Synced · ${email}`;
   }
 
+  function showSyncError(message) {
+    syncStatusEl.hidden = false;
+    syncStatusEl.textContent = message;
+    syncStatusEl.classList.add('sync-bar__status--error');
+    setTimeout(() => {
+      if (!signedIn) {
+        syncStatusEl.hidden = true;
+        syncStatusEl.classList.remove('sync-bar__status--error');
+      }
+    }, 6000);
+  }
+
   async function pullAndMerge() {
     if (!signedIn || syncing) return;
     syncing = true;
@@ -206,48 +218,18 @@
       }
     } catch (e) {
       console.error('[Matcha List] Sync pull/push failed:', e);
+      if (e && e.type === 'not_signed_in') {
+        setSyncUI(null);
+        showSyncError('Sync session expired — sign in again to keep syncing.');
+      }
     } finally {
       syncing = false;
     }
   }
 
-  signInBtn.addEventListener('click', async () => {
-    const originalLabel = signInBtn.innerHTML;
-    try {
-      const email = await window.DriveSync.signIn();
-      if (email) {
-        setSyncUI(email);
-        await pullAndMerge();
-      } else {
-        console.error('[Matcha List] Sign-in returned no email — token was granted but profile lookup failed.');
-        showSyncError('Signed in, but couldn’t confirm account. Try again.');
-      }
-    } catch (e) {
-      console.error('[Matcha List] Google sign-in failed:', e);
-      const reason = (e && (e.type || e.error)) || 'unknown';
-      if (reason === 'popup_closed' || reason === 'popup_failed_to_open') {
-        showSyncError('Popup was blocked or closed — allow popups for this site and try again.');
-      } else if (reason === 'timed_out') {
-        showSyncError('Sign-in didn’t complete — try again, or use Chrome if you were on Safari.');
-      } else {
-        showSyncError(`Sign-in failed (${reason}). Check the console for details.`);
-      }
-    } finally {
-      signInBtn.innerHTML = originalLabel;
-    }
+  signInBtn.addEventListener('click', () => {
+    window.DriveSync.signIn();
   });
-
-  function showSyncError(message) {
-    syncStatusEl.hidden = false;
-    syncStatusEl.textContent = message;
-    syncStatusEl.classList.add('sync-bar__status--error');
-    setTimeout(() => {
-      if (!signedIn) {
-        syncStatusEl.hidden = true;
-        syncStatusEl.classList.remove('sync-bar__status--error');
-      }
-    }, 6000);
-  }
 
   signOutBtn.addEventListener('click', () => {
     window.DriveSync.signOut();
@@ -256,10 +238,13 @@
 
   window.addEventListener('load', async () => {
     if (!window.DriveSync) return;
-    const email = await window.DriveSync.trySilentSignIn();
-    if (email) {
-      setSyncUI(email);
+    const result = await window.DriveSync.init();
+    if (result.signedIn) {
+      setSyncUI(result.email);
       await pullAndMerge();
+    } else if (result.error) {
+      console.error('[Matcha List] Sign-in did not complete:', result.error);
+      showSyncError(`Sign-in failed (${result.error}). Try again.`);
     }
   });
 
