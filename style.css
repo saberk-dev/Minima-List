@@ -98,6 +98,65 @@ body {
   color: var(--grey-600);
 }
 
+/* ---------- Sync bar ---------- */
+
+.sync-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: -6px;
+}
+
+.sync-bar__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--grey-300);
+  background: var(--white);
+  color: var(--grey-900);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.sync-bar__btn:hover {
+  border-color: var(--matcha);
+  background: var(--matcha-light);
+}
+
+.sync-bar__status {
+  flex: 1;
+  font-size: 0.78rem;
+  color: var(--matcha-darker);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sync-bar__signout {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: var(--grey-600);
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: var(--radius-sm);
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.sync-bar__signout:hover {
+  color: #C0685C;
+  background: var(--grey-100);
+}
+
 /* ---------- Add form ---------- */
 
 .add-form {

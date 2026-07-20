@@ -1,9 +1,10 @@
-const CACHE_NAME = 'matcha-list-v1';
+const CACHE_NAME = 'matcha-list-v2';
 const APP_SHELL = [
   './',
   './index.html',
   './style.css',
   './app.js',
+  './drive-sync.js',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png',
@@ -31,6 +32,7 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
+  if (new URL(event.request.url).origin !== self.location.origin) return;
 
   event.respondWith(
     caches.match(event.request).then(cached => {

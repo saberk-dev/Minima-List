@@ -1,5 +1,5 @@
 (() => {
-  const STORAGE_KEY = 'matcha-list.tasks.v1';
+  const STORAGE_KEY = 'matcha-list.tasks.v2';
 
   const form = document.getElementById('add-form');
   const input = document.getElementById('new-task-input');
@@ -10,21 +10,47 @@
   const countEl = document.getElementById('task-count');
   const clearBtn = document.getElementById('clear-completed');
   const template = document.getElementById('task-item-template');
+  const signInBtn = document.getElementById('google-signin-btn');
+  const signOutBtn = document.getElementById('google-signout-btn');
+  const syncStatusEl = document.getElementById('sync-status');
 
-  let tasks = loadTasks();
+  let tasks = [];
+  let updatedAt = 0;
   let filter = 'all';
+  let signedIn = false;
+  let pushTimer = null;
+  let syncing = false;
 
-  function loadTasks() {
+  loadLocal();
+
+  function loadLocal() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : [];
+      const parsed = raw ? JSON.parse(raw) : null;
+      tasks = (parsed && parsed.tasks) || [];
+      updatedAt = (parsed && parsed.updatedAt) || 0;
     } catch (e) {
-      return [];
+      tasks = [];
+      updatedAt = 0;
     }
   }
 
-  function saveTasks() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+  function persistLocal() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ updatedAt, tasks }));
+  }
+
+  function touch() {
+    updatedAt = Date.now();
+    persistLocal();
+    schedulePush();
+  }
+
+  function schedulePush() {
+    if (!signedIn) return;
+    clearTimeout(pushTimer);
+    pushTimer = setTimeout(() => {
+      window.DriveSync.push({ updatedAt, tasks }).catch(() => {});
+    }, 800);
   }
 
   function makeId() {
@@ -35,7 +61,7 @@
     const trimmed = text.trim();
     if (!trimmed) return;
     tasks.unshift({ id: makeId(), text: trimmed, done: false, createdAt: Date.now() });
-    saveTasks();
+    touch();
     render();
   }
 
@@ -43,13 +69,13 @@
     const task = tasks.find(t => t.id === id);
     if (!task) return;
     task.done = !task.done;
-    saveTasks();
+    touch();
     render();
   }
 
   function deleteTask(id) {
     tasks = tasks.filter(t => t.id !== id);
-    saveTasks();
+    touch();
     render();
   }
 
@@ -62,12 +88,12 @@
       return;
     }
     task.text = trimmed;
-    saveTasks();
+    touch();
   }
 
   function clearCompleted() {
     tasks = tasks.filter(t => !t.done);
-    saveTasks();
+    touch();
     render();
   }
 
@@ -152,4 +178,67 @@
       navigator.serviceWorker.register('sw.js').catch(() => {});
     });
   }
+
+  // ---------- Google Drive sync ----------
+
+  function setSyncUI(email) {
+    signedIn = !!email;
+    signInBtn.hidden = signedIn;
+    signOutBtn.hidden = !signedIn;
+    syncStatusEl.hidden = !signedIn;
+    if (signedIn) syncStatusEl.textContent = `Synced · ${email}`;
+  }
+
+  async function pullAndMerge() {
+    if (!signedIn || syncing) return;
+    syncing = true;
+    try {
+      const remote = await window.DriveSync.pull();
+      if (!remote) {
+        await window.DriveSync.push({ updatedAt, tasks });
+      } else if (remote.updatedAt > updatedAt) {
+        tasks = remote.tasks || [];
+        updatedAt = remote.updatedAt;
+        persistLocal();
+        render();
+      } else if (updatedAt > remote.updatedAt) {
+        await window.DriveSync.push({ updatedAt, tasks });
+      }
+    } catch (e) {
+      // offline or token issue; silently skip this cycle
+    } finally {
+      syncing = false;
+    }
+  }
+
+  signInBtn.addEventListener('click', async () => {
+    try {
+      const email = await window.DriveSync.signIn();
+      if (email) {
+        setSyncUI(email);
+        await pullAndMerge();
+      }
+    } catch (e) {
+      // user closed the popup or denied access; stay signed out
+    }
+  });
+
+  signOutBtn.addEventListener('click', () => {
+    window.DriveSync.signOut();
+    setSyncUI(null);
+  });
+
+  window.addEventListener('load', async () => {
+    if (!window.DriveSync) return;
+    const email = await window.DriveSync.trySilentSignIn();
+    if (email) {
+      setSyncUI(email);
+      await pullAndMerge();
+    }
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) pullAndMerge();
+  });
+  window.addEventListener('focus', () => pullAndMerge());
 })();
