@@ -26,8 +26,20 @@ window.DriveSync = (function () {
 
   function requestToken(prompt) {
     return new Promise((resolve, reject) => {
+      let settled = false;
+      const timer = setTimeout(() => {
+        if (settled) return;
+        settled = true;
+        console.error('[Matcha List] Token request timed out after 45s (prompt=' + prompt + ').');
+        reject({ type: 'timed_out' });
+      }, 45000);
+
       const client = ensureTokenClient();
       client.callback = (resp) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        console.log('[Matcha List] Token callback fired.', resp && resp.error ? resp : { hasToken: !!(resp && resp.access_token) });
         if (resp && resp.error) {
           reject(resp);
           return;
@@ -36,7 +48,14 @@ window.DriveSync = (function () {
         tokenExpiresAt = Date.now() + (Number(resp.expires_in) || 3600) * 1000 - 60000;
         resolve(resp);
       };
-      client.error_callback = (err) => reject(err);
+      client.error_callback = (err) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        console.error('[Matcha List] Token error_callback fired.', err);
+        reject(err);
+      };
+      console.log('[Matcha List] Requesting access token (prompt=' + prompt + ')...');
       client.requestAccessToken({ prompt });
     });
   }

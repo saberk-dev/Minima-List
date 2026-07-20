@@ -205,23 +205,49 @@
         await window.DriveSync.push({ updatedAt, tasks });
       }
     } catch (e) {
-      // offline or token issue; silently skip this cycle
+      console.error('[Matcha List] Sync pull/push failed:', e);
     } finally {
       syncing = false;
     }
   }
 
   signInBtn.addEventListener('click', async () => {
+    const originalLabel = signInBtn.innerHTML;
     try {
       const email = await window.DriveSync.signIn();
       if (email) {
         setSyncUI(email);
         await pullAndMerge();
+      } else {
+        console.error('[Matcha List] Sign-in returned no email — token was granted but profile lookup failed.');
+        showSyncError('Signed in, but couldn’t confirm account. Try again.');
       }
     } catch (e) {
-      // user closed the popup or denied access; stay signed out
+      console.error('[Matcha List] Google sign-in failed:', e);
+      const reason = (e && (e.type || e.error)) || 'unknown';
+      if (reason === 'popup_closed' || reason === 'popup_failed_to_open') {
+        showSyncError('Popup was blocked or closed — allow popups for this site and try again.');
+      } else if (reason === 'timed_out') {
+        showSyncError('Sign-in didn’t complete — try again, or use Chrome if you were on Safari.');
+      } else {
+        showSyncError(`Sign-in failed (${reason}). Check the console for details.`);
+      }
+    } finally {
+      signInBtn.innerHTML = originalLabel;
     }
   });
+
+  function showSyncError(message) {
+    syncStatusEl.hidden = false;
+    syncStatusEl.textContent = message;
+    syncStatusEl.classList.add('sync-bar__status--error');
+    setTimeout(() => {
+      if (!signedIn) {
+        syncStatusEl.hidden = true;
+        syncStatusEl.classList.remove('sync-bar__status--error');
+      }
+    }, 6000);
+  }
 
   signOutBtn.addEventListener('click', () => {
     window.DriveSync.signOut();

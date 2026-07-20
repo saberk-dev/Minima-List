@@ -1,4 +1,4 @@
-const CACHE_NAME = 'matcha-list-v2';
+const CACHE_NAME = 'matcha-list-v3';
 const APP_SHELL = [
   './',
   './index.html',

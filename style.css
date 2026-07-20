@@ -138,6 +138,11 @@ body {
   white-space: nowrap;
 }
 
+.sync-bar__status--error {
+  color: #B5544A;
+  white-space: normal;
+}
+
 .sync-bar__signout {
   flex-shrink: 0;
   border: none;
