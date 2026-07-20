@@ -1,6 +1,6 @@
 window.DriveSync = (function () {
   const CLIENT_ID = '286567158042-3gk1d231utf5mggarhgf9fmb28510d4i.apps.googleusercontent.com';
-  const SCOPE = 'https://www.googleapis.com/auth/drive.appdata';
+  const SCOPE = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.email';
   const FILE_NAME = 'matcha-list.json';
   const LINKED_EMAIL_KEY = 'matcha-list.google-email';
 
@@ -64,7 +64,10 @@ window.DriveSync = (function () {
     const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      console.error('[Matcha List] userinfo lookup failed:', res.status, await res.text().catch(() => ''));
+      return null;
+    }
     const data = await res.json();
     return data.email || null;
   }
