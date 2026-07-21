@@ -2,7 +2,7 @@
   "name": "Matcha List",
   "short_name": "Matcha List",
   "description": "A cute, calm matcha-themed to-do list.",
-  "start_url": "./index.html",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",

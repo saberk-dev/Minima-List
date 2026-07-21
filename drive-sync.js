@@ -7,7 +7,10 @@ window.DriveSync = (function () {
   let fileId = null;
 
   function redirectUri() {
-    return window.location.origin + window.location.pathname;
+    // Hardcoded (not derived from window.location) so it's identical no matter how the
+    // app was launched — home screen icon, Safari tab with/without index.html, etc. — and
+    // always matches the single Authorized redirect URI registered with Google.
+    return 'https://saberk-dev.github.io/Minima-List/';
   }
 
   function getStoredToken() {
